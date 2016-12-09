@@ -21,31 +21,30 @@ import java.lang.Math;
 
 public class VectorFieldDemo {
 
-   public static void main(String[] args) {
-      VFFrame mframe = new VFFrame();
-   }
+	public static void main(String[] args) {
+		VFFrame mframe = new VFFrame();
+	}
 }
 
 class VFFrame extends JFrame {
 
-   public VFFrame() {
-      super("Vector Field Demo");
+	public VFFrame() {
+		super("Vector Field Demo");
 		this.setResizable(false);
 		this.setSize(400,400);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-   }
-   // TODO: check some other jframe code to make control panel,
-   // pack control panel on the right of the vfpanel
+	}
+	// TODO: check some other jframe code to make control panel,
+	// pack control panel on the right of the vfpanel
 
-   private class VFPanel extends JPanel {
-      
-      public VFPanel() {
-         super();
-      }
-      
+	private class VFPanel extends JPanel {
+		public VFPanel() {
+			super();
+		}
+
 		public Dimension getPreferredSize() {
 			return new Dimension(400,400);
 		}
-   }
+	}
 }
