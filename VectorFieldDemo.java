@@ -27,6 +27,10 @@ public class VectorFieldDemo {
 }
 
 class VFFrame extends JFrame {
+	JPanel mainPanel;
+	JPanel controlPanel;
+	JPanel eqnPanel;
+	VFPanel vf;
 
 	public VFFrame() {
 		super("Vector Field Demo");
@@ -34,6 +38,22 @@ class VFFrame extends JFrame {
 		this.setSize(400,400);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Container c = this.getContentPane();
+		controlPanel = new JPanel();
+		controlPanel.setLayout(new GridLayout(3, 1));
+		eqnPanel = new JPanel();
+		eqnPanel.add(new JLabel("sample text"));
+		controlPanel.add(eqnPanel);
+		controlPanel.add(new JLabel("more sample text"));
+		vf = new VFPanel();
+		mainPanel = new JPanel();
+		mainPanel.add(vf);
+		mainPanel.add(controlPanel);
+		this.add(mainPanel);
+		this.pack();
+		//c.add(vf);
+		//c.add(controlPanel);
+		//this.pack();
 	}
 	// TODO: check some other jframe code to make control panel,
 	// pack control panel on the right of the vfpanel
@@ -42,6 +62,11 @@ class VFFrame extends JFrame {
 		public VFPanel() {
 			super();
 		}
+
+		public void paintComponent(Graphics g) {
+			g.drawLine(1,1,100,100);
+		}
+
 
 		public Dimension getPreferredSize() {
 			return new Dimension(400,400);
