@@ -23,8 +23,12 @@ import net.objecthunter.exp4j.*;
 
 public class VectorFieldDemo {
 
-   public static void main(String[] args) {
+   public static void main(String[] args) throws Exception {
       VFFrame mframe = new VFFrame();
+      while(true) {
+         mframe.tick();
+         Thread.sleep(100);
+      }
    }
 }
 
@@ -36,18 +40,26 @@ class VFFrame extends JFrame {
    private JTextField iComp;
    private JTextField jComp;
    private VFPanel vf;
-   private final Color darkColor = new Color(0,0,0);
-   private final Color lightShade = new Color(175,175,175);
+   private boolean isPlaying;
+   
+   
+   private static final Color darkColor = new Color(0,0,0);
+   private static final Color lightShade = new Color(175,175,175);
+   private static final int resolution = 100;
+   
+   private double pointX;
+   private double pointY;
+   private boolean isPoint = false;
 
    public VFFrame() {
       super("Vector Field Demo");
       this.setResizable(false);
-      this.setSize(400,400);
+      this.setSize(400,400); // gets repacked
       this.setVisible(true);
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       Container c = this.getContentPane();
       controlPanel = new JPanel();
-      controlPanel.setLayout(new GridLayout(3, 1));
+      controlPanel.setLayout(new GridLayout(6, 1));
       iComp = new JTextField("-y",5);
       jComp = new JTextField("x",5);
       iComp.setHorizontalAlignment(JTextField.RIGHT);
@@ -59,6 +71,8 @@ class VFFrame extends JFrame {
       eqnPanel.add(jComp);
       eqnPanel.add(new JLabel("j"));
       controlPanel.add(eqnPanel);
+      controlPanel.add(new JLabel("placeholder 1"));
+      //controlPanel.add(new JLabel("placeholder 2"));
       update = new JButton("Update");
       update.addActionListener(new ActionListener() { 
          public void actionPerformed(ActionEvent e) {
@@ -67,6 +81,7 @@ class VFFrame extends JFrame {
       });
       controlPanel.add(update);
       vf = new VFPanel();
+      vf.addMouseListener(new VFMouseListener());
       mainPanel = new JPanel();
       mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
       mainPanel.add(vf);
@@ -74,12 +89,45 @@ class VFFrame extends JFrame {
       this.add(mainPanel);
       this.pack();
    }
+   
+   public void tick() {
+      double dx,dy;
+      if(isPlaying) {
+         if(isPoint) {
+            for(int i = 0; i < resolution; i ++) {
+               dx = vf.evalXAt(pointX, pointY);
+               dy = vf.evalYAt(pointX, pointY);
+               pointX += dx / resolution;
+               pointY += dy / resolution;
+            }
+         }
+      }
+   }
+   
+   private class VFMouseListener implements MouseListener {
+      public void mousePressed(MouseEvent e) {
+         System.out.println("pressed at " + e.getX() + "," + e.getY());
+      }
+      public void mouseReleased(MouseEvent e) {
+         System.out.println("released at " + e.getX() + "," + e.getY());
+      }
+      public void mouseClicked(MouseEvent e) {
+         System.out.println("clicked at " + e.getX() + "," + e.getY());
+         //pointX = 
+      }
+      
+      public void mouseExited(MouseEvent e) {}
+      public void mouseEntered(MouseEvent e) {}
+   }
 
    private class VFPanel extends JPanel {
-      int minX = -15;
-      int maxX = 15;
-      int minY = -15;
-      int maxY = 15;
+      private static final int wWidth = 400;
+      private static final int wHeight = 400;
+      
+      int minX = -5;
+      int maxX = 5;
+      int minY = -5;
+      int maxY = 5;
       private final double vHat = 5.0;
       private final double branchAngle = Math.PI / 6.0;
       
@@ -87,6 +135,7 @@ class VFFrame extends JFrame {
          super();
       }
 
+      // TODO: change 400s to width and height for more dynamic
       public void paintComponent(Graphics g) {
          g.setColor(new Color(255,255,255));
          g.fillRect(0,0,400,400);
@@ -141,17 +190,25 @@ class VFFrame extends JFrame {
       }
 
       private double evalXAt(double x, double y) {
-         Expression e = new ExpressionBuilder(iComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
-         return e.evaluate();
+         try {
+            Expression e = new ExpressionBuilder(iComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
+            return e.evaluate();
+         } catch (ArithmeticException e) {
+            return 0;
+         }
       }
       
       private double evalYAt(double x, double y) {
-         Expression e = new ExpressionBuilder(jComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
-         return e.evaluate();
+         try {
+            Expression e = new ExpressionBuilder(jComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
+            return e.evaluate();
+         } catch (ArithmeticException e) {
+            return 0;
+         }   
       }
 
       public Dimension getPreferredSize() {
-         return new Dimension(400,400);
+         return new Dimension(wWidth,wHeight);
       }
    }
 }
