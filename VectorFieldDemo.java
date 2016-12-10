@@ -27,7 +27,8 @@ public class VectorFieldDemo {
       VFFrame mframe = new VFFrame();
       while(true) {
          mframe.tick();
-         Thread.sleep(100);
+         Thread.sleep(4);
+         mframe.repaint();
       }
    }
 }
@@ -37,15 +38,21 @@ class VFFrame extends JFrame {
    private JPanel controlPanel;
    private JPanel eqnPanel;
    private JButton update;
+   
    private JTextField iComp;
    private JTextField jComp;
+   private String iCompExpr;
+   private String jCompExpr;
+   
    private VFPanel vf;
-   private boolean isPlaying;
+   private boolean isPlaying = true;
    
    
    private static final Color darkColor = new Color(0,0,0);
    private static final Color lightShade = new Color(175,175,175);
-   private static final int resolution = 100;
+   private static final Color highlightColor = new Color(255,0,0);
+   private static final int resolution = 1000;
+   private static final double factor = 100.0;
    
    private double pointX;
    private double pointY;
@@ -62,6 +69,8 @@ class VFFrame extends JFrame {
       controlPanel.setLayout(new GridLayout(6, 1));
       iComp = new JTextField("-y",5);
       jComp = new JTextField("x",5);
+      iCompExpr = iComp.getText();
+      jCompExpr = jComp.getText();
       iComp.setHorizontalAlignment(JTextField.RIGHT);
       jComp.setHorizontalAlignment(JTextField.RIGHT);
       eqnPanel = new JPanel();
@@ -76,12 +85,13 @@ class VFFrame extends JFrame {
       update = new JButton("Update");
       update.addActionListener(new ActionListener() { 
          public void actionPerformed(ActionEvent e) {
-            repaint();
+            iCompExpr = iComp.getText();
+            jCompExpr = jComp.getText();
          }
       });
       controlPanel.add(update);
       vf = new VFPanel();
-      vf.addMouseListener(new VFMouseListener());
+      vf.addMouseListener(new VFMouseListener(vf));
       mainPanel = new JPanel();
       mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
       mainPanel.add(vf);
@@ -97,14 +107,20 @@ class VFFrame extends JFrame {
             for(int i = 0; i < resolution; i ++) {
                dx = vf.evalXAt(pointX, pointY);
                dy = vf.evalYAt(pointX, pointY);
-               pointX += dx / resolution;
-               pointY += dy / resolution;
+               pointX += dx / (factor * resolution);
+               pointY += dy / (factor * resolution);
             }
          }
       }
    }
    
    private class VFMouseListener implements MouseListener {
+      private VFPanel parent;
+      
+      public VFMouseListener(VFPanel myParent) {
+         parent = myParent;
+      }
+      
       public void mousePressed(MouseEvent e) {
          System.out.println("pressed at " + e.getX() + "," + e.getY());
       }
@@ -112,8 +128,12 @@ class VFFrame extends JFrame {
          System.out.println("released at " + e.getX() + "," + e.getY());
       }
       public void mouseClicked(MouseEvent e) {
-         System.out.println("clicked at " + e.getX() + "," + e.getY());
-         //pointX = 
+         //System.out.println("clicked at " + e.getX() + "," + e.getY());
+         pointX = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
+         //System.out.println("pointX is " + pointX);
+         pointY = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
+         //System.out.println("pointY is " + pointY);
+         isPoint = true;
       }
       
       public void mouseExited(MouseEvent e) {}
@@ -121,13 +141,13 @@ class VFFrame extends JFrame {
    }
 
    private class VFPanel extends JPanel {
-      private static final int wWidth = 400;
-      private static final int wHeight = 400;
+      public static final int wWidth = 400;
+      public static final int wHeight = 400;
       
-      int minX = -5;
-      int maxX = 5;
-      int minY = -5;
-      int maxY = 5;
+      public int minX = -5;
+      public int maxX = 5;
+      public int minY = -5;
+      public int maxY = 5;
       private final double vHat = 5.0;
       private final double branchAngle = Math.PI / 6.0;
       
@@ -187,11 +207,19 @@ class VFFrame extends JFrame {
                g.drawLine((int)(sx+dx), (int)(sy+dy), (int)(sx+dx-vHat*Math.cos(theta-branchAngle)), (int)(sy+dy-vHat*Math.sin(theta-branchAngle)));
             }
          }
+         if(isPoint) {
+            g.setColor(highlightColor);
+            double px, py;
+            px = (pointX - minX + 1) * wWidth / (maxX - minX + 2);
+            py = (-pointY - minY + 1) * wHeight / (maxY - minY + 2); 
+            g.fillOval((int)(px-2.5), (int)(py-2.5), 6, 6);
+         }
+         
       }
 
       private double evalXAt(double x, double y) {
          try {
-            Expression e = new ExpressionBuilder(iComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
+            Expression e = new ExpressionBuilder(iCompExpr).variables("x","y").build().setVariable("x",x).setVariable("y",y);
             return e.evaluate();
          } catch (ArithmeticException e) {
             return 0;
@@ -200,7 +228,7 @@ class VFFrame extends JFrame {
       
       private double evalYAt(double x, double y) {
          try {
-            Expression e = new ExpressionBuilder(jComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
+            Expression e = new ExpressionBuilder(jCompExpr).variables("x","y").build().setVariable("x",x).setVariable("y",y);
             return e.evaluate();
          } catch (ArithmeticException e) {
             return 0;
