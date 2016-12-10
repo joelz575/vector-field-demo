@@ -29,13 +29,15 @@ public class VectorFieldDemo {
 }
 
 class VFFrame extends JFrame {
-   JPanel mainPanel;
-   JPanel controlPanel;
-   JPanel eqnPanel;
-   JButton update;
-   JTextField iComp;
-   JTextField jComp;
-   VFPanel vf;
+   private JPanel mainPanel;
+   private JPanel controlPanel;
+   private JPanel eqnPanel;
+   private JButton update;
+   private JTextField iComp;
+   private JTextField jComp;
+   private VFPanel vf;
+   private final Color darkColor = new Color(0,0,0);
+   private final Color lightShade = new Color(175,175,175);
 
    public VFFrame() {
       super("Vector Field Demo");
@@ -64,7 +66,6 @@ class VFFrame extends JFrame {
          }
       });
       controlPanel.add(update);
-      //controlPanel.add(new JLabel("more sample text"));
       vf = new VFPanel();
       mainPanel = new JPanel();
       mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -72,16 +73,13 @@ class VFFrame extends JFrame {
       mainPanel.add(controlPanel);
       this.add(mainPanel);
       this.pack();
-      //c.add(vf);
-      //c.add(controlPanel);
-      //this.pack();
    }
 
    private class VFPanel extends JPanel {
-      int minX = -6;
-      int maxX = 6;
-      int minY = -6;
-      int maxY = 6;
+      int minX = -15;
+      int maxX = 15;
+      int minY = -15;
+      int maxY = 15;
       private final double vHat = 5.0;
       private final double branchAngle = Math.PI / 6.0;
       
@@ -92,25 +90,30 @@ class VFFrame extends JFrame {
       public void paintComponent(Graphics g) {
          g.setColor(new Color(255,255,255));
          g.fillRect(0,0,400,400);
-         g.setColor(new Color(0,0,0));
+         g.setColor(darkColor);
          int numXRegions = maxX - minX + 2;
          int numYRegions = maxY - minY + 2;
          double xWidth = 400.0 / numXRegions;
          double yWidth = 400.0 / numYRegions;
+         
+         g.setColor(lightShade);
          for(int i = 1; i < numXRegions; i ++) {
             g.drawLine((int)(i * 400.0 / numXRegions), 0,(int)( i * 400.0 / numXRegions), 400);
-            if(i + minX == 1) {
-               g.drawLine((int)(i * 400.0 / numXRegions) + 1, 0,(int)( i * 400.0 / numXRegions) + 1, 400);
-               g.drawLine((int)(i * 400.0 / numXRegions) - 1, 0,(int)( i * 400.0 / numXRegions) - 1, 400);
-            }
          }
+         
          for(int i = 1; i < numYRegions; i ++) {
             g.drawLine(0, (int)(i * 400.0 / numYRegions), 400, (int)( i * 400.0 / numYRegions));
-            if(i + minY == 1) {
-               g.drawLine(0, (int)(i * 400.0 / numYRegions) + 1, 400, (int)( i * 400.0 / numYRegions) + 1);
-               g.drawLine(0, (int)(i * 400.0 / numYRegions) - 1, 400, (int)( i * 400.0 / numYRegions) - 1);
-            }
          }
+         
+         g.setColor(darkColor);
+         g.drawLine(0, (int)((1-minY) * 400.0 / numYRegions) + 1, 400, (int)( (1-minY) * 400.0 / numYRegions) + 1);
+         g.drawLine(0, (int)((1-minY) * 400.0 / numYRegions), 400, (int)( (1-minY) * 400.0 / numYRegions));
+         g.drawLine(0, (int)((1-minY) * 400.0 / numYRegions) - 1, 400, (int)( (1-minY) * 400.0 / numYRegions) - 1);
+         
+         g.drawLine((int)((1-minX) * 400.0 / numXRegions) + 1, 0,(int)( (1-minX) * 400.0 / numXRegions) + 1, 400);
+         g.drawLine((int)((1-minX) * 400.0 / numXRegions), 0,(int)( (1-minX) * 400.0 / numXRegions), 400);
+         g.drawLine((int)((1-minX) * 400.0 / numXRegions) - 1, 0,(int)( (1-minX) * 400.0 / numXRegions) - 1, 400);
+               
          double[][][] values = new double[maxX-minX+1][maxY-minY+1][2];
          double maxDist = -1;
          double d;
@@ -130,9 +133,9 @@ class VFFrame extends JFrame {
                dx = xWidth * values[i-1][j-1][0] / maxDist;
                dy = yWidth * values[i-1][j-1][1] / maxDist;
                theta = Math.atan2(dy, dx);
-               g.drawLine((int)(0.5+sx), (int)(0.5+sy), (int)(0.5+sx+dx), (int)(0.5+sy+dy));
-               g.drawLine((int)(0.5+sx+dx), (int)(0.5+sy+dy), (int)(0.5+sx+dx-vHat*Math.cos(theta+branchAngle)), (int)(0.5+sy+dy-vHat*Math.sin(theta+branchAngle)));
-               g.drawLine((int)(0.5+sx+dx), (int)(0.5+sy+dy), (int)(0.5+sx+dx-vHat*Math.cos(theta-branchAngle)), (int)(0.5+sy+dy-vHat*Math.sin(theta-branchAngle)));
+               g.drawLine((int)(sx), (int)(sy), (int)(sx+dx), (int)(sy+dy));
+               g.drawLine((int)(sx+dx), (int)(sy+dy), (int)(sx+dx-vHat*Math.cos(theta+branchAngle)), (int)(sy+dy-vHat*Math.sin(theta+branchAngle)));
+               g.drawLine((int)(sx+dx), (int)(sy+dy), (int)(sx+dx-vHat*Math.cos(theta-branchAngle)), (int)(sy+dy-vHat*Math.sin(theta-branchAngle)));
             }
          }
       }
@@ -140,13 +143,11 @@ class VFFrame extends JFrame {
       private double evalXAt(double x, double y) {
          Expression e = new ExpressionBuilder(iComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
          return e.evaluate();
-         //return -y;
       }
       
       private double evalYAt(double x, double y) {
          Expression e = new ExpressionBuilder(jComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
          return e.evaluate();
-         //return x;
       }
 
       public Dimension getPreferredSize() {
