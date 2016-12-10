@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.lang.Math;
 
+import net.objecthunter.exp4j.*;
+
 
 public class VectorFieldDemo {
 
