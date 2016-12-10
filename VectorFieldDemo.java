@@ -32,6 +32,8 @@ class VFFrame extends JFrame {
    JPanel mainPanel;
    JPanel controlPanel;
    JPanel eqnPanel;
+   JTextField iComp;
+   JTextField jComp;
    VFPanel vf;
 
    public VFFrame() {
@@ -43,10 +45,18 @@ class VFFrame extends JFrame {
       Container c = this.getContentPane();
       controlPanel = new JPanel();
       controlPanel.setLayout(new GridLayout(3, 1));
+      iComp = new JTextField("-y",5);
+      jComp = new JTextField("x",5);
+      iComp.setHorizontalAlignment(JTextField.RIGHT);
+      jComp.setHorizontalAlignment(JTextField.RIGHT);
       eqnPanel = new JPanel();
-      eqnPanel.add(new JLabel("sample text"));
+      eqnPanel.add(new JLabel("f(x,y) = "));
+      eqnPanel.add(iComp);
+      eqnPanel.add(new JLabel("i + "));
+      eqnPanel.add(jComp);
+      eqnPanel.add(new JLabel("j"));
       controlPanel.add(eqnPanel);
-      controlPanel.add(new JLabel("more sample text"));
+      //controlPanel.add(new JLabel("more sample text"));
       vf = new VFPanel();
       mainPanel = new JPanel();
       mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
