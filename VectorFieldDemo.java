@@ -122,10 +122,10 @@ class VFFrame extends JFrame {
       }
       
       public void mousePressed(MouseEvent e) {
-         System.out.println("pressed at " + e.getX() + "," + e.getY());
+         //System.out.println("pressed at " + e.getX() + "," + e.getY());
       }
       public void mouseReleased(MouseEvent e) {
-         System.out.println("released at " + e.getX() + "," + e.getY());
+         //System.out.println("released at " + e.getX() + "," + e.getY());
       }
       public void mouseClicked(MouseEvent e) {
          //System.out.println("clicked at " + e.getX() + "," + e.getY());
@@ -133,6 +133,7 @@ class VFFrame extends JFrame {
          //System.out.println("pointX is " + pointX);
          pointY = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
          //System.out.println("pointY is " + pointY);
+         //System.out.println("The vector at where you clicked is <" + parent.evalXAt(pointX,pointY) + ", " + parent.evalYAt(pointX, pointY) + ">");
          isPoint = true;
       }
       
@@ -188,8 +189,8 @@ class VFFrame extends JFrame {
          double d;
          for(int i = 0; i < maxX-minX+3; i ++) {
             for(int j = 0; j < maxY-minY+3; j ++) {
-               values[i][j][0] = evalXAt(minX + i - 1, minY + j - 1);
-               values[i][j][1] = evalYAt(minX + i - 1, minY + j - 1);
+               values[i][j][0] = evalXAt(minX + i - 1, maxY - j + 1);
+               values[i][j][1] = evalYAt(minX + i - 1, maxY - j + 1);
                d = Math.hypot(values[i][j][0], values[i][j][1]);
                if(d > maxDist) maxDist = d;
             }
@@ -202,9 +203,9 @@ class VFFrame extends JFrame {
                dx = xWidth * values[i][j][0] / maxDist;
                dy = yWidth * values[i][j][1] / maxDist;
                theta = Math.atan2(dy, dx);
-               g.drawLine((int)(sx), (int)(sy), (int)(sx+dx), (int)(sy+dy));
-               g.drawLine((int)(sx+dx), (int)(sy+dy), (int)(sx+dx-vHat*Math.cos(theta+branchAngle)), (int)(sy+dy-vHat*Math.sin(theta+branchAngle)));
-               g.drawLine((int)(sx+dx), (int)(sy+dy), (int)(sx+dx-vHat*Math.cos(theta-branchAngle)), (int)(sy+dy-vHat*Math.sin(theta-branchAngle)));
+               g.drawLine((int)(sx), (int)(sy), (int)(sx+dx), (int)(sy-dy));
+               g.drawLine((int)(sx+dx), (int)(sy-dy), (int)(sx+dx-vHat*Math.cos(theta+branchAngle)), (int)(sy-dy+vHat*Math.sin(theta+branchAngle)));
+               g.drawLine((int)(sx+dx), (int)(sy-dy), (int)(sx+dx-vHat*Math.cos(theta-branchAngle)), (int)(sy-dy+vHat*Math.sin(theta-branchAngle)));
             }
          }
          if(isPoint) {
@@ -217,7 +218,7 @@ class VFFrame extends JFrame {
          
       }
 
-      private double evalXAt(double x, double y) {
+      public double evalXAt(double x, double y) {
          try {
             Expression e = new ExpressionBuilder(iCompExpr).variables("x","y").build().setVariable("x",x).setVariable("y",y);
             return e.evaluate();
@@ -226,7 +227,7 @@ class VFFrame extends JFrame {
          }
       }
       
-      private double evalYAt(double x, double y) {
+      public double evalYAt(double x, double y) {
          try {
             Expression e = new ExpressionBuilder(jCompExpr).variables("x","y").build().setVariable("x",x).setVariable("y",y);
             return e.evaluate();
