@@ -32,6 +32,7 @@ class VFFrame extends JFrame {
    JPanel mainPanel;
    JPanel controlPanel;
    JPanel eqnPanel;
+   JButton update;
    JTextField iComp;
    JTextField jComp;
    VFPanel vf;
@@ -56,6 +57,13 @@ class VFFrame extends JFrame {
       eqnPanel.add(jComp);
       eqnPanel.add(new JLabel("j"));
       controlPanel.add(eqnPanel);
+      update = new JButton("Update");
+      update.addActionListener(new ActionListener() { 
+         public void actionPerformed(ActionEvent e) {
+            repaint();
+         }
+      });
+      controlPanel.add(update);
       //controlPanel.add(new JLabel("more sample text"));
       vf = new VFPanel();
       mainPanel = new JPanel();
@@ -130,11 +138,15 @@ class VFFrame extends JFrame {
       }
 
       private double evalXAt(double x, double y) {
-         return -y;
+         Expression e = new ExpressionBuilder(iComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
+         return e.evaluate();
+         //return -y;
       }
       
       private double evalYAt(double x, double y) {
-         return x;
+         Expression e = new ExpressionBuilder(jComp.getText()).variables("x","y").build().setVariable("x",x).setVariable("y",y);
+         return e.evaluate();
+         //return x;
       }
 
       public Dimension getPreferredSize() {
