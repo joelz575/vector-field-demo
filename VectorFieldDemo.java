@@ -62,6 +62,8 @@ class VFFrame extends JFrame {
       int maxX = 6;
       int minY = -6;
       int maxY = 6;
+      private final double vHat = 5.0;
+      private final double branchAngle = Math.PI / 6.0;
       
       public VFPanel() {
          super();
@@ -96,24 +98,23 @@ class VFFrame extends JFrame {
             for(int j = 0; j < maxY-minY+1; j ++) {
                values[i][j][0] = evalXAt(minX + i, minY + j);
                values[i][j][1] = evalYAt(minX + i, minY + j);
-               d = dist(values[i][j][0], values[i][j][1]);
+               d = Math.hypot(values[i][j][0], values[i][j][1]);
                if(d > maxDist) maxDist = d;
             }
          }
-         double sx, sy, dx, dy;
+         double sx, sy, dx, dy, theta;
          for(int i = 1; i < numXRegions; i ++) {
             for(int j = 1; j < numYRegions; j ++) {
                sx = i * xWidth;
                sy = j * yWidth;
                dx = xWidth * values[i-1][j-1][0] / maxDist;
                dy = yWidth * values[i-1][j-1][1] / maxDist;
-               g.drawLine((int)sx, (int)sy, (int)(sx+dx), (int)(sy+dy));
+               theta = Math.atan2(dy, dx);
+               g.drawLine((int)(0.5+sx), (int)(0.5+sy), (int)(0.5+sx+dx), (int)(0.5+sy+dy));
+               g.drawLine((int)(0.5+sx+dx), (int)(0.5+sy+dy), (int)(0.5+sx+dx-vHat*Math.cos(theta+branchAngle)), (int)(0.5+sy+dy-vHat*Math.sin(theta+branchAngle)));
+               g.drawLine((int)(0.5+sx+dx), (int)(0.5+sy+dy), (int)(0.5+sx+dx-vHat*Math.cos(theta-branchAngle)), (int)(0.5+sy+dy-vHat*Math.sin(theta-branchAngle)));
             }
          }
-      }
-      
-      private double dist(double x, double y) {
-         return Math.sqrt(x*x+y*y);
       }
 
       private double evalXAt(double x, double y) {
