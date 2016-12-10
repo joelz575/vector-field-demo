@@ -114,24 +114,24 @@ class VFFrame extends JFrame {
          g.drawLine((int)((1-minX) * 400.0 / numXRegions), 0,(int)( (1-minX) * 400.0 / numXRegions), 400);
          g.drawLine((int)((1-minX) * 400.0 / numXRegions) - 1, 0,(int)( (1-minX) * 400.0 / numXRegions) - 1, 400);
                
-         double[][][] values = new double[maxX-minX+1][maxY-minY+1][2];
+         double[][][] values = new double[maxX-minX+3][maxY-minY+3][2];
          double maxDist = -1;
          double d;
-         for(int i = 0; i < maxX-minX+1; i ++) {
-            for(int j = 0; j < maxY-minY+1; j ++) {
-               values[i][j][0] = evalXAt(minX + i, minY + j);
-               values[i][j][1] = evalYAt(minX + i, minY + j);
+         for(int i = 0; i < maxX-minX+3; i ++) {
+            for(int j = 0; j < maxY-minY+3; j ++) {
+               values[i][j][0] = evalXAt(minX + i - 1, minY + j - 1);
+               values[i][j][1] = evalYAt(minX + i - 1, minY + j - 1);
                d = Math.hypot(values[i][j][0], values[i][j][1]);
                if(d > maxDist) maxDist = d;
             }
          }
          double sx, sy, dx, dy, theta;
-         for(int i = 1; i < numXRegions; i ++) {
-            for(int j = 1; j < numYRegions; j ++) {
+         for(int i = 0; i < numXRegions+1; i ++) {
+            for(int j = 0; j < numYRegions+1; j ++) {
                sx = i * xWidth;
                sy = j * yWidth;
-               dx = xWidth * values[i-1][j-1][0] / maxDist;
-               dy = yWidth * values[i-1][j-1][1] / maxDist;
+               dx = xWidth * values[i][j][0] / maxDist;
+               dy = yWidth * values[i][j][1] / maxDist;
                theta = Math.atan2(dy, dx);
                g.drawLine((int)(sx), (int)(sy), (int)(sx+dx), (int)(sy+dy));
                g.drawLine((int)(sx+dx), (int)(sy+dy), (int)(sx+dx-vHat*Math.cos(theta+branchAngle)), (int)(sy+dy-vHat*Math.sin(theta+branchAngle)));
