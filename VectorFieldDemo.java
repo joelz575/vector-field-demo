@@ -16,6 +16,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.LinkedList;
 import java.lang.Math;
 
 import net.objecthunter.exp4j.*;
@@ -47,6 +48,7 @@ class VFFrame extends JFrame {
    private VFPanel vf;
    private boolean isPlaying = true;
    
+   private LinkedList<TrackPoint> tracking = new LinkedList<TrackPoint>();
    
    private static final Color darkColor = new Color(0,0,0);
    private static final Color lightShade = new Color(175,175,175);
@@ -54,9 +56,13 @@ class VFFrame extends JFrame {
    private static final int resolution = 1000;
    private static final double factor = 100.0;
    
+   private static final boolean enableTracking = true;
+   private static final int numLastPoints = 15;
+   
    private double pointX;
    private double pointY;
    private boolean isPoint = false;
+   private int tickTime = 0;
 
    public VFFrame() {
       super("Vector Field Demo");
@@ -101,9 +107,16 @@ class VFFrame extends JFrame {
    }
    
    public void tick() {
+      tickTime ++;
       double dx,dy;
       if(isPlaying) {
          if(isPoint) {
+            if(tickTime % 5 == 0) {
+               tracking.add(new TrackPoint(pointX, pointY));
+               if(tracking.size() > numLastPoints) {
+                  tracking.pollFirst();
+               }
+            }
             for(int i = 0; i < resolution; i ++) {
                dx = vf.evalXAt(pointX, pointY);
                dy = vf.evalYAt(pointX, pointY);
@@ -111,6 +124,16 @@ class VFFrame extends JFrame {
                pointY += dy / (factor * resolution);
             }
          }
+      }
+   }
+   
+   private class TrackPoint {
+      public double x;
+      public double y;
+      
+      public TrackPoint(double x, double y) {
+         this.x = x;
+         this.y = y;
       }
    }
    
@@ -208,14 +231,19 @@ class VFFrame extends JFrame {
                g.drawLine((int)(sx+dx), (int)(sy-dy), (int)(sx+dx-vHat*Math.cos(theta-branchAngle)), (int)(sy-dy+vHat*Math.sin(theta-branchAngle)));
             }
          }
+         double px, py;
          if(isPoint) {
             g.setColor(highlightColor);
-            double px, py;
             px = (pointX - minX + 1) * wWidth / (maxX - minX + 2);
             py = (-pointY - minY + 1) * wHeight / (maxY - minY + 2); 
             g.fillOval((int)(px-2.5), (int)(py-2.5), 6, 6);
          }
          
+         for(TrackPoint tp : tracking) {
+            px = (tp.x - minX + 1) * wWidth / (maxX - minX + 2);
+            py = (-tp.y - minY + 1) * wHeight / (maxY - minY + 2); 
+            g.drawLine((int)(px+0.5), (int)(py+0.5), (int)(px+0.5), (int)(py+0.5));
+         }
       }
 
       public double evalXAt(double x, double y) {
