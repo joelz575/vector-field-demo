@@ -145,19 +145,13 @@ class VFFrame extends JFrame {
       }
       
       public void mousePressed(MouseEvent e) {
-         //System.out.println("pressed at " + e.getX() + "," + e.getY());
       }
       public void mouseReleased(MouseEvent e) {
-         //System.out.println("released at " + e.getX() + "," + e.getY());
+         pointX = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
+         pointY = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
+         isPoint = true;
       }
       public void mouseClicked(MouseEvent e) {
-         //System.out.println("clicked at " + e.getX() + "," + e.getY());
-         pointX = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
-         //System.out.println("pointX is " + pointX);
-         pointY = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
-         //System.out.println("pointY is " + pointY);
-         //System.out.println("The vector at where you clicked is <" + parent.evalXAt(pointX,pointY) + ", " + parent.evalYAt(pointX, pointY) + ">");
-         isPoint = true;
       }
       
       public void mouseExited(MouseEvent e) {}
