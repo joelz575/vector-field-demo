@@ -269,6 +269,16 @@ class VFFrame extends JFrame {
             py = (-mpoint.y - minY + 1) * wHeight / (maxY - minY + 2); 
             g.fillOval((int)(px-2.5), (int)(py-2.5), 6, 6);
          }
+         else if(isRect) {
+            g.setColor(highlightColor);
+            int[] pxs = new int[4];
+            int[] pys = new int[4];
+            for(int j = 0; j < 4; j ++) {
+               pxs[j] = (int)(0.5 + (rect[j].x - minX + 1) * wWidth / (maxX - minX + 2));
+               pys[j] = (int)(0.5 + (-rect[j].y - minY + 1) * wHeight / (maxY - minY + 2)); 
+            }
+            g.fillPolygon(pxs, pys, 4);
+         }
          
          for(TrackPoint tp : tracking) {
             px = (tp.x - minX + 1) * wWidth / (maxX - minX + 2);
