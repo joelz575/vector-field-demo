@@ -165,6 +165,7 @@ class VFFrame extends JFrame {
             rect[i] = new TrackPoint(0,0);
          }
          isPoint = false;
+         isRect = false;
          isSelectingRect = true;
          rect[0].x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
          rect[0].y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
@@ -279,11 +280,12 @@ class VFFrame extends JFrame {
             }
             g.fillPolygon(pxs, pys, 4);
          }
-         
-         for(TrackPoint tp : tracking) {
-            px = (tp.x - minX + 1) * wWidth / (maxX - minX + 2);
-            py = (-tp.y - minY + 1) * wHeight / (maxY - minY + 2); 
-            g.drawLine((int)(px+0.5), (int)(py+0.5), (int)(px+0.5), (int)(py+0.5));
+         if(isPoint) {
+            for(TrackPoint tp : tracking) {
+               px = (tp.x - minX + 1) * wWidth / (maxX - minX + 2);
+               py = (-tp.y - minY + 1) * wHeight / (maxY - minY + 2); 
+               g.drawLine((int)(px+0.5), (int)(py+0.5), (int)(px+0.5), (int)(py+0.5));
+            }
          }
       }
 
