@@ -59,9 +59,15 @@ class VFFrame extends JFrame {
    private static final boolean enableTracking = true;
    private static final int numLastPoints = 15;
    
-   private double pointX;
-   private double pointY;
+   private TrackPoint mpoint = new TrackPoint(0,0);
+   
+   private TrackPoint[] rect = new TrackPoint[4];
+   //private double pointX;
+   //private double pointY;
    private boolean isPoint = false;
+   private boolean isRect = false;
+   private boolean isSelectingRect = false;
+   
    private int tickTime = 0;
 
    public VFFrame() {
@@ -112,16 +118,26 @@ class VFFrame extends JFrame {
       if(isPlaying) {
          if(isPoint) {
             if(tickTime % 5 == 0) {
-               tracking.add(new TrackPoint(pointX, pointY));
+               tracking.add(new TrackPoint(mpoint.x, mpoint.y));
                if(tracking.size() > numLastPoints) {
                   tracking.pollFirst();
                }
             }
             for(int i = 0; i < resolution; i ++) {
-               dx = vf.evalXAt(pointX, pointY);
-               dy = vf.evalYAt(pointX, pointY);
-               pointX += dx / (factor * resolution);
-               pointY += dy / (factor * resolution);
+               dx = vf.evalXAt(mpoint.x, mpoint.y);
+               dy = vf.evalYAt(mpoint.x, mpoint.y);
+               mpoint.x += dx / (factor * resolution);
+               mpoint.y += dy / (factor * resolution);
+            }
+         }
+         else if(isRect) {
+            for(int j = 0; j < 4; j ++) {
+               for(int i = 0; i < resolution; i ++) {
+                  dx = vf.evalXAt(rect[j].x, rect[j].y);
+                  dy = vf.evalYAt(rect[j].x, rect[j].y);
+                  rect[j].x += dx / (factor * resolution);
+                  rect[j].y += dy / (factor * resolution);
+               }
             }
          }
       }
@@ -145,13 +161,34 @@ class VFFrame extends JFrame {
       }
       
       public void mousePressed(MouseEvent e) {
+         for(int i = 0; i < 4; i ++) {
+            rect[i] = new TrackPoint(0,0);
+         }
+         isPoint = false;
+         isSelectingRect = true;
+         rect[0].x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
+         rect[0].y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
       }
+      
       public void mouseReleased(MouseEvent e) {
-         pointX = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
-         pointY = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
-         isPoint = true;
+         if(isPoint)
+            return;
+         isSelectingRect = false;
+         isRect = true;
+         rect[2].x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
+         rect[2].y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
+         rect[1].x = rect[0].x;
+         rect[1].y = rect[2].y;
+         rect[3].x = rect[2].x;
+         rect[3].y = rect[0].y;
       }
+      
       public void mouseClicked(MouseEvent e) {
+         isSelectingRect = false;
+         isRect = false;
+         isPoint = true;
+         mpoint.x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
+         mpoint.y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
       }
       
       public void mouseExited(MouseEvent e) {}
@@ -228,8 +265,8 @@ class VFFrame extends JFrame {
          double px, py;
          if(isPoint) {
             g.setColor(highlightColor);
-            px = (pointX - minX + 1) * wWidth / (maxX - minX + 2);
-            py = (-pointY - minY + 1) * wHeight / (maxY - minY + 2); 
+            px = (mpoint.x - minX + 1) * wWidth / (maxX - minX + 2);
+            py = (-mpoint.y - minY + 1) * wHeight / (maxY - minY + 2); 
             g.fillOval((int)(px-2.5), (int)(py-2.5), 6, 6);
          }
          
