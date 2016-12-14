@@ -211,15 +211,14 @@ class VFFrame extends JFrame {
          super();
       }
 
-      // TODO: change 400s to width and height for more dynamic
       public void paintComponent(Graphics g) {
          g.setColor(new Color(255,255,255));
-         g.fillRect(0,0,400,400);
+         g.fillRect(0,0,wWidth,wHeight);
          g.setColor(darkColor);
          int numXRegions = maxX - minX + 2;
          int numYRegions = maxY - minY + 2;
-         double xWidth = 400.0 / numXRegions;
-         double yWidth = 400.0 / numYRegions;
+         double xWidth = ((double)wWidth) / numXRegions;
+         double yWidth = ((double)wHeight) / numYRegions;
          
          g.setColor(lightShade);
          for(int i = 1; i < numXRegions; i ++) {
@@ -231,13 +230,13 @@ class VFFrame extends JFrame {
          }
          
          g.setColor(darkColor);
-         g.drawLine(0, (int)((1-minY) * 400.0 / numYRegions) + 1, 400, (int)( (1-minY) * 400.0 / numYRegions) + 1);
-         g.drawLine(0, (int)((1-minY) * 400.0 / numYRegions), 400, (int)( (1-minY) * 400.0 / numYRegions));
-         g.drawLine(0, (int)((1-minY) * 400.0 / numYRegions) - 1, 400, (int)( (1-minY) * 400.0 / numYRegions) - 1);
+         g.drawLine(0, (int)((1-minY) *  ((double)wHeight) / numYRegions) + 1, wWidth, (int)( (1-minY) * ((double)wHeight) / numYRegions) + 1);
+         g.drawLine(0, (int)((1-minY) *  ((double)wHeight) / numYRegions), wWidth, (int)( (1-minY) * ((double)wHeight) / numYRegions));
+         g.drawLine(0, (int)((1-minY) *  ((double)wHeight) / numYRegions) - 1, wWidth, (int)( (1-minY) * ((double)wHeight) / numYRegions) - 1);
          
-         g.drawLine((int)((1-minX) * 400.0 / numXRegions) + 1, 0,(int)( (1-minX) * 400.0 / numXRegions) + 1, 400);
-         g.drawLine((int)((1-minX) * 400.0 / numXRegions), 0,(int)( (1-minX) * 400.0 / numXRegions), 400);
-         g.drawLine((int)((1-minX) * 400.0 / numXRegions) - 1, 0,(int)( (1-minX) * 400.0 / numXRegions) - 1, 400);
+         g.drawLine((int)((1-minX) * ((double)wWidth) / numXRegions) + 1, 0,(int)( (1-minX) * ((double)wWidth) / numXRegions) + 1, wHeight);
+         g.drawLine((int)((1-minX) * ((double)wWidth) / numXRegions), 0,(int)( (1-minX) * ((double)wWidth) / numXRegions), wHeight);
+         g.drawLine((int)((1-minX) * ((double)wWidth) / numXRegions) - 1, 0,(int)( (1-minX) * ((double)wWidth) / numXRegions) - 1, wHeight);
                
          double[][][] values = new double[maxX-minX+3][maxY-minY+3][2];
          double maxDist = -1;
