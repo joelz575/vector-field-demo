@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -17,6 +18,7 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.lang.Math;
 
 import net.objecthunter.exp4j.*;
@@ -24,17 +26,20 @@ import net.objecthunter.exp4j.*;
 
 public class VectorFieldDemo {
 
+   public static int timeDelay = 4;
+   
    public static void main(String[] args) throws Exception {
       VFFrame mframe = new VFFrame();
       while(true) {
          mframe.tick();
-         Thread.sleep(4);
+         Thread.sleep(timeDelay);
          mframe.repaint();
       }
    }
 }
 
 class VFFrame extends JFrame {
+
    private JPanel mainPanel;
    private JPanel controlPanel;
    private JPanel eqnPanel;
@@ -45,25 +50,26 @@ class VFFrame extends JFrame {
    private String iCompExpr;
    private String jCompExpr;
    
+   private JSlider speedControl;
+   
    private VFPanel vf;
    private boolean isPlaying = true;
    
-   private LinkedList<TrackPoint> tracking = new LinkedList<TrackPoint>();
+   private ConcurrentLinkedDeque<TrackPoint> tracking = new ConcurrentLinkedDeque<TrackPoint>();
    
    private static final Color darkColor = new Color(0,0,0);
    private static final Color lightShade = new Color(175,175,175);
    private static final Color highlightColor = new Color(255,0,0);
-   private static final int resolution = 1000;
+   private static final int resolution = 100;
    private static final double factor = 100.0;
    
    private static final boolean enableTracking = true;
    private static final int numLastPoints = 15;
    
+  
    private TrackPoint mpoint = new TrackPoint(0,0);
    
    private TrackPoint[] rect = new TrackPoint[4];
-   //private double pointX;
-   //private double pointY;
    private boolean isPoint = false;
    private boolean isRect = false;
    private boolean isSelectingRect = false;
@@ -92,8 +98,6 @@ class VFFrame extends JFrame {
       eqnPanel.add(jComp);
       eqnPanel.add(new JLabel("j"));
       controlPanel.add(eqnPanel);
-      controlPanel.add(new JLabel("placeholder 1"));
-      //controlPanel.add(new JLabel("placeholder 2"));
       update = new JButton("Update");
       update.addActionListener(new ActionListener() { 
          public void actionPerformed(ActionEvent e) {
@@ -102,6 +106,15 @@ class VFFrame extends JFrame {
          }
       });
       controlPanel.add(update);
+      speedControl = new JSlider(JSlider.HORIZONTAL, 1, 10, 6);
+      speedControl.addChangeListener(new SliderListener());
+      speedControl.setMajorTickSpacing(5);
+      speedControl.setMinorTickSpacing(1);
+      speedControl.setPaintTicks(true);
+      controlPanel.add(new JLabel("Speed:"));
+      controlPanel.add(speedControl);
+      //controlPanel.add(new JLabel("placeholder 1"));
+      //controlPanel.add(new JLabel("placeholder 2"));
       vf = new VFPanel();
       vf.addMouseListener(new VFMouseListener(vf));
       mainPanel = new JPanel();
@@ -139,6 +152,15 @@ class VFFrame extends JFrame {
                   rect[j].y += dy / (factor * resolution);
                }
             }
+         }
+      }
+   }
+   
+   private class SliderListener implements ChangeListener {
+      public void stateChanged(ChangeEvent e) {
+         JSlider source = (JSlider)e.getSource();
+         if(!source.getValueIsAdjusting()) {
+            VectorFieldDemo.timeDelay = 10 - source.getValue();
          }
       }
    }
