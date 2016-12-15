@@ -51,6 +51,7 @@ class VFFrame extends JFrame {
    private String jCompExpr;
    
    private JSlider speedControl;
+   private JSlider resControl;
    
    private VFPanel vf;
    private boolean isPlaying = true;
@@ -60,8 +61,10 @@ class VFFrame extends JFrame {
    private static final Color darkColor = new Color(0,0,0);
    private static final Color lightShade = new Color(175,175,175);
    private static final Color highlightColor = new Color(255,0,0);
-   private static final int resolution = 100;
+   private static final int baseres = 100;
    private static final double factor = 100.0;
+   
+   private static int resolution = 100;
    
    private static final boolean enableTracking = true;
    private static final int numLastPoints = 15;
@@ -71,7 +74,7 @@ class VFFrame extends JFrame {
    
    //private TrackPoint[] rect = new TrackPoint[4];
    private ArrayList<TrackPoint> figure = new ArrayList<TrackPoint>();
-   private int figureResolution = 15;
+   private int figureResolution = 20;
    
    private TrackPoint startPoint = new TrackPoint(0,0);
    
@@ -112,12 +115,19 @@ class VFFrame extends JFrame {
       });
       controlPanel.add(update);
       speedControl = new JSlider(JSlider.HORIZONTAL, 1, 10, 6);
-      speedControl.addChangeListener(new SliderListener());
+      speedControl.addChangeListener(new SpeedSliderListener());
       speedControl.setMajorTickSpacing(5);
       speedControl.setMinorTickSpacing(1);
       speedControl.setPaintTicks(true);
       controlPanel.add(new JLabel("Speed:"));
       controlPanel.add(speedControl);
+      resControl = new JSlider(JSlider.HORIZONTAL, 0, 20, 10);
+      resControl.addChangeListener(new ResSliderListener());
+      resControl.setMajorTickSpacing(5);
+      resControl.setMinorTickSpacing(1);
+      resControl.setPaintTicks(true);
+      controlPanel.add(new JLabel("Resolution:"));
+      controlPanel.add(resControl);
       //controlPanel.add(new JLabel("placeholder 1"));
       //controlPanel.add(new JLabel("placeholder 2"));
       vf = new VFPanel();
@@ -161,11 +171,30 @@ class VFFrame extends JFrame {
       }
    }
    
-   private class SliderListener implements ChangeListener {
+   private class SpeedSliderListener implements ChangeListener {
       public void stateChanged(ChangeEvent e) {
          JSlider source = (JSlider)e.getSource();
          if(!source.getValueIsAdjusting()) {
             VectorFieldDemo.timeDelay = 10 - source.getValue();
+         }
+      }
+   }
+   
+   
+   private class ResSliderListener implements ChangeListener {
+      public void stateChanged(ChangeEvent e) {
+         JSlider source = (JSlider)e.getSource();
+         if(!source.getValueIsAdjusting()) {
+            int val = source.getValue();
+            if(val < 10) {
+               resolution = baseres / (11-val);
+            }
+            else if(val > 10) {
+               resolution = baseres * (val-9);
+            }
+            else {
+               resolution = baseres;
+            }
          }
       }
    }
