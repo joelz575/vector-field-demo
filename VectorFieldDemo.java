@@ -69,7 +69,12 @@ class VFFrame extends JFrame {
   
    private TrackPoint mpoint = new TrackPoint(0,0);
    
-   private TrackPoint[] rect = new TrackPoint[4];
+   //private TrackPoint[] rect = new TrackPoint[4];
+   private ArrayList<TrackPoint> figure = new ArrayList<TrackPoint>();
+   private int figureResolution = 15;
+   
+   private TrackPoint startPoint = new TrackPoint(0,0);
+   
    private boolean isPoint = false;
    private boolean isRect = false;
    private boolean isSelectingRect = false;
@@ -144,12 +149,12 @@ class VFFrame extends JFrame {
             }
          }
          else if(isRect) {
-            for(int j = 0; j < 4; j ++) {
-               for(int i = 0; i < resolution; i ++) {
-                  dx = vf.evalXAt(rect[j].x, rect[j].y);
-                  dy = vf.evalYAt(rect[j].x, rect[j].y);
-                  rect[j].x += dx / (factor * resolution);
-                  rect[j].y += dy / (factor * resolution);
+            for(int j = 0; j < figure.size(); j ++) {
+               for(int i = 0; i < resolution/10.0; i ++) {
+                  dx = vf.evalXAt(figure.get(j).x, figure.get(j).y);
+                  dy = vf.evalYAt(figure.get(j).x, figure.get(j).y);
+                  figure.get(j).x += dx / (factor * resolution);
+                  figure.get(j).y += dy / (factor * resolution);
                }
             }
          }
@@ -184,26 +189,48 @@ class VFFrame extends JFrame {
       
       public void mousePressed(MouseEvent e) {
          for(int i = 0; i < 4; i ++) {
-            rect[i] = new TrackPoint(0,0);
          }
          isPoint = false;
          isRect = false;
          isSelectingRect = true;
-         rect[0].x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
-         rect[0].y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
+         startPoint.x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
+         startPoint.y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
+         
+         //rect[0].x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
+         //rect[0].y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
       }
       
       public void mouseReleased(MouseEvent e) {
          if(isPoint)
             return;
+            
+         figure = new ArrayList<TrackPoint>();
+         
          isSelectingRect = false;
          isRect = true;
-         rect[2].x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
+         
+         double tx, ty;
+         tx = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
+         ty = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
+         for(int i = 0; i < figureResolution; i ++) { // along x = startPoint.x
+            figure.add(new TrackPoint(startPoint.x, startPoint.y + (i * (ty - startPoint.y) / figureResolution)));
+         }
+         for(int i = 0; i < figureResolution; i ++) { // along y = ty
+            figure.add(new TrackPoint(startPoint.x + (i * (tx - startPoint.x) / figureResolution), ty));
+         }
+         for(int i = 0; i < figureResolution; i ++) { // along x = tx
+            figure.add(new TrackPoint(tx, ty + (i * (startPoint.y - ty) / figureResolution)));
+         }
+         for(int i = 0; i < figureResolution; i ++) { // along y = startPoint.y
+            figure.add(new TrackPoint(tx + (i * (startPoint.x - tx) / figureResolution), startPoint.y));
+         }
+         
+         /*rect[2].x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
          rect[2].y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
          rect[1].x = rect[0].x;
          rect[1].y = rect[2].y;
          rect[3].x = rect[2].x;
-         rect[3].y = rect[0].y;
+         rect[3].y = rect[0].y;*/
       }
       
       public void mouseClicked(MouseEvent e) {
@@ -293,13 +320,13 @@ class VFFrame extends JFrame {
          }
          else if(isRect) {
             g.setColor(highlightColor);
-            int[] pxs = new int[4];
-            int[] pys = new int[4];
-            for(int j = 0; j < 4; j ++) {
-               pxs[j] = (int)(0.5 + (rect[j].x - minX + 1) * wWidth / (maxX - minX + 2));
-               pys[j] = (int)(0.5 + (-rect[j].y - minY + 1) * wHeight / (maxY - minY + 2)); 
+            int[] pxs = new int[figure.size()];
+            int[] pys = new int[figure.size()];
+            for(int j = 0; j < figure.size(); j ++) {
+               pxs[j] = (int)(0.5 + (figure.get(j).x - minX + 1) * wWidth / (maxX - minX + 2));
+               pys[j] = (int)(0.5 + (-figure.get(j).y - minY + 1) * wHeight / (maxY - minY + 2)); 
             }
-            g.fillPolygon(pxs, pys, 4);
+            g.fillPolygon(pxs, pys, figure.size());
          }
          if(isPoint) {
             for(TrackPoint tp : tracking) {
