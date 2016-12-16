@@ -217,16 +217,11 @@ class VFFrame extends JFrame {
       }
       
       public void mousePressed(MouseEvent e) {
-         for(int i = 0; i < 4; i ++) {
-         }
          isPoint = false;
          isRect = false;
          isSelectingRect = true;
          startPoint.x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
          startPoint.y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
-         
-         //rect[0].x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
-         //rect[0].y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
       }
       
       public void mouseReleased(MouseEvent e) {
@@ -253,13 +248,6 @@ class VFFrame extends JFrame {
          for(int i = 0; i < figureResolution; i ++) { // along y = startPoint.y
             figure.add(new TrackPoint(tx + (i * (startPoint.x - tx) / figureResolution), startPoint.y));
          }
-         
-         /*rect[2].x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
-         rect[2].y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
-         rect[1].x = rect[0].x;
-         rect[1].y = rect[2].y;
-         rect[3].x = rect[2].x;
-         rect[3].y = rect[0].y;*/
       }
       
       public void mouseClicked(MouseEvent e) {
@@ -300,11 +288,11 @@ class VFFrame extends JFrame {
          
          g.setColor(lightShade);
          for(int i = 1; i < numXRegions; i ++) {
-            g.drawLine((int)(i * 400.0 / numXRegions), 0,(int)( i * 400.0 / numXRegions), 400);
+            g.drawLine((int)(i * wWidth / numXRegions), 0,(int)( i * 400.0 / numXRegions), 400);
          }
          
          for(int i = 1; i < numYRegions; i ++) {
-            g.drawLine(0, (int)(i * 400.0 / numYRegions), 400, (int)( i * 400.0 / numYRegions));
+            g.drawLine(0, (int)(i * wHeight / numYRegions), 400, (int)( i * 400.0 / numYRegions));
          }
          
          g.setColor(darkColor);
