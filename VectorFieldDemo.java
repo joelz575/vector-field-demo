@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.border.*;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -41,7 +42,9 @@ public class VectorFieldDemo {
 class VFFrame extends JFrame {
 
    private JPanel mainPanel;
+   private JPanel rightPanel;
    private JPanel controlPanel;
+   private JPanel viewPanel;
    private JPanel eqnPanel;
    private JButton update;
    
@@ -136,12 +139,24 @@ class VFFrame extends JFrame {
       figResControl.setPaintTicks(true);
       controlPanel.add(new JLabel("Figure (Side) Resolution:"));
       controlPanel.add(figResControl);
+      TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Controls");
+      title.setTitleJustification(TitledBorder.LEFT);
+      controlPanel.setBorder(title);
       vf = new VFPanel();
       vf.addMouseListener(new VFMouseListener(vf));
+      viewPanel = new JPanel(new GridLayout(3,1));
+      viewPanel.add(new JLabel("placeholder text 1"));
+      TitledBorder title2 = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Values");
+      title2.setTitleJustification(TitledBorder.LEFT);
+      viewPanel.setBorder(title2);
+      rightPanel = new JPanel();
+      rightPanel.setLayout(new BorderLayout(5, 10));
+      rightPanel.add(controlPanel, BorderLayout.NORTH);
+      rightPanel.add(viewPanel, BorderLayout.SOUTH);
       mainPanel = new JPanel();
       mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
       mainPanel.add(vf);
-      mainPanel.add(controlPanel);
+      mainPanel.add(rightPanel);
       this.add(mainPanel);
       this.pack();
    }
