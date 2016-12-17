@@ -52,6 +52,7 @@ class VFFrame extends JFrame {
    
    private JSlider speedControl;
    private JSlider resControl;
+   private JSlider figResControl;
    
    private VFPanel vf;
    private boolean isPlaying = true;
@@ -92,7 +93,7 @@ class VFFrame extends JFrame {
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       Container c = this.getContentPane();
       controlPanel = new JPanel();
-      controlPanel.setLayout(new GridLayout(6, 1));
+      controlPanel.setLayout(new GridLayout(8, 1));
       iComp = new JTextField("-y",5);
       jComp = new JTextField("x",5);
       iCompExpr = iComp.getText();
@@ -106,7 +107,7 @@ class VFFrame extends JFrame {
       eqnPanel.add(jComp);
       eqnPanel.add(new JLabel("j"));
       controlPanel.add(eqnPanel);
-      update = new JButton("Update");
+      update = new JButton("Update Vector Field");
       update.addActionListener(new ActionListener() { 
          public void actionPerformed(ActionEvent e) {
             iCompExpr = iComp.getText();
@@ -128,8 +129,13 @@ class VFFrame extends JFrame {
       resControl.setPaintTicks(true);
       controlPanel.add(new JLabel("Resolution:"));
       controlPanel.add(resControl);
-      //controlPanel.add(new JLabel("placeholder 1"));
-      //controlPanel.add(new JLabel("placeholder 2"));
+      figResControl = new JSlider(JSlider.HORIZONTAL, 10, 40, 20);
+      figResControl.addChangeListener(new FigureResSliderListener()); 
+      figResControl.setMajorTickSpacing(5);
+      figResControl.setMinorTickSpacing(1);
+      figResControl.setPaintTicks(true);
+      controlPanel.add(new JLabel("Figure (Side) Resolution:"));
+      controlPanel.add(figResControl);
       vf = new VFPanel();
       vf.addMouseListener(new VFMouseListener(vf));
       mainPanel = new JPanel();
@@ -195,6 +201,16 @@ class VFFrame extends JFrame {
             else {
                resolution = baseres;
             }
+         }
+      }
+   }
+   
+   
+   private class FigureResSliderListener implements ChangeListener {
+      public void stateChanged(ChangeEvent e) {
+         JSlider source = (JSlider)e.getSource();
+         if(!source.getValueIsAdjusting()) {
+            figureResolution = source.getValue();
          }
       }
    }
