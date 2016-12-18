@@ -58,11 +58,14 @@ class VFFrame extends JFrame {
    private JSlider figResControl;
    
    private VFPanel vf;
+   private VectorDisplayPanel vdp;
+   
    private boolean isPlaying = true;
    
    private ConcurrentLinkedDeque<TrackPoint> tracking = new ConcurrentLinkedDeque<TrackPoint>();
    
    private static final Color darkColor = new Color(0,0,0);
+   private static final Color veryLightShade = new Color(215,215,215);
    private static final Color lightShade = new Color(175,175,175);
    private static final Color highlightColor = new Color(255,0,0);
    private static final int baseres = 100;
@@ -144,8 +147,10 @@ class VFFrame extends JFrame {
       controlPanel.setBorder(title);
       vf = new VFPanel();
       vf.addMouseListener(new VFMouseListener(vf));
+      vdp = new VectorDisplayPanel();
       viewPanel = new JPanel(new GridLayout(3,1));
-      viewPanel.add(new JLabel("placeholder text 1"));
+      viewPanel.add(new JLabel("placeholder"));
+      viewPanel.add(vdp);
       TitledBorder title2 = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Values");
       title2.setTitleJustification(TitledBorder.LEFT);
       viewPanel.setBorder(title2);
@@ -164,20 +169,28 @@ class VFFrame extends JFrame {
    public void tick() {
       tickTime ++;
       double dx,dy;
+      dx = -1.0;
+      dy = -1.0;
       if(isPlaying) {
          if(isPoint) {
+         
             if(tickTime % 5 == 0) {
                tracking.add(new TrackPoint(mpoint.x, mpoint.y));
                if(tracking.size() > numLastPoints) {
                   tracking.pollFirst();
                }
             }
+            
             for(int i = 0; i < resolution; i ++) {
                dx = vf.evalXAt(mpoint.x, mpoint.y);
                dy = vf.evalYAt(mpoint.x, mpoint.y);
                mpoint.x += dx / (factor * resolution);
                mpoint.y += dy / (factor * resolution);
             }
+            
+            double mm = vf.getMaxMagnitude();
+            vdp.setScaled(dx/mm,dy/mm);
+            
          }
          else if(isRect) {
             for(int j = 0; j < figure.size(); j ++) {
@@ -249,6 +262,7 @@ class VFFrame extends JFrame {
       
       public void mousePressed(MouseEvent e) {
          isPoint = false;
+         vdp.setDisplay(false);
          isRect = false;
          isSelectingRect = true;
          startPoint.x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
@@ -285,12 +299,68 @@ class VFFrame extends JFrame {
          isSelectingRect = false;
          isRect = false;
          isPoint = true;
+         vdp.setDisplay(true);
          mpoint.x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
          mpoint.y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
       }
       
       public void mouseExited(MouseEvent e) {}
       public void mouseEntered(MouseEvent e) {}
+   }
+   
+   private class VectorDisplayPanel extends JPanel {
+      public static final int wWidth = 61;
+      public static final int wHeight = 61;
+      
+      private static final double vMagn = 30.0;
+      
+      private static final double vHat = 5.0;
+      private static final double branchAngle = Math.PI / 6.0;
+      
+      private double scaledX = 0.0;
+      private double scaledY = 0.0;
+      
+      private boolean isDisplay = false;
+      
+      public VectorDisplayPanel() {
+         super();
+      }  
+      
+      public void setScaled(double x, double y) {
+         scaledX = x;
+         scaledY = y;
+      }
+      
+      public void setDisplay(boolean ndisp) {
+         isDisplay = ndisp;
+      }
+
+      public void paintComponent(Graphics g) {
+         if(!isDisplay) {
+            g.setColor(veryLightShade);
+            g.fillRect(0,0,wWidth,wHeight);
+            return;
+         }
+         g.setColor(new Color(255,255,255));
+         g.fillRect(0,0,wWidth,wHeight);
+         g.setColor(lightShade);
+         g.drawLine(wWidth/2,0,wWidth/2,wHeight);
+         g.drawLine(0,wHeight/2,wWidth,wHeight/2);
+         g.setColor(darkColor);
+         double sx, sy, dx, dy, theta;
+         sx = wWidth/2;
+         sy = wHeight/2;
+         dx = vMagn * scaledX;
+         dy = vMagn * scaledY;
+         theta = Math.atan2(scaledY, scaledX);
+         g.drawLine((int)(sx), (int)(sy), (int)(sx+dx), (int)(sy-dy));
+         g.drawLine((int)(sx+dx), (int)(sy-dy), (int)(sx+dx-vHat*Math.cos(theta+branchAngle)), (int)(sy-dy+vHat*Math.sin(theta+branchAngle)));
+         g.drawLine((int)(sx+dx), (int)(sy-dy), (int)(sx+dx-vHat*Math.cos(theta-branchAngle)), (int)(sy-dy+vHat*Math.sin(theta-branchAngle)));
+      }
+
+      public Dimension getPreferredSize() {
+         return new Dimension(wWidth,wHeight);
+      }
    }
 
    private class VFPanel extends JPanel {
@@ -301,11 +371,18 @@ class VFFrame extends JFrame {
       public int maxX = 5;
       public int minY = -5;
       public int maxY = 5;
-      private final double vHat = 5.0;
-      private final double branchAngle = Math.PI / 6.0;
+      
+      private double maxMagnitude = -1.0;
+      
+      private static final double vHat = 5.0;
+      private static final double branchAngle = Math.PI / 6.0;
       
       public VFPanel() {
          super();
+      }
+      
+      public double getMaxMagnitude() {
+         return maxMagnitude;
       }
 
       public void paintComponent(Graphics g) {
@@ -346,6 +423,7 @@ class VFFrame extends JFrame {
                if(d > maxDist) maxDist = d;
             }
          }
+         maxMagnitude = maxDist;
          double sx, sy, dx, dy, theta;
          for(int i = 0; i < numXRegions+1; i ++) {
             for(int j = 0; j < numYRegions+1; j ++) {
