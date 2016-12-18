@@ -46,7 +46,13 @@ class VFFrame extends JFrame {
    private JPanel controlPanel;
    private JPanel viewPanel;
    private JPanel eqnPanel;
+   private JPanel statViewPanel;
    private JButton update;
+   
+   private JTextField xPos;
+   private JTextField yPos;
+   private JTextField curl;
+   private JTextField div;
    
    private JTextField iComp;
    private JTextField jComp;
@@ -142,17 +148,54 @@ class VFFrame extends JFrame {
       figResControl.setPaintTicks(true);
       controlPanel.add(new JLabel("Figure (Side) Resolution:"));
       controlPanel.add(figResControl);
-      TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Controls");
-      title.setTitleJustification(TitledBorder.LEFT);
-      controlPanel.setBorder(title);
       vf = new VFPanel();
       vf.addMouseListener(new VFMouseListener(vf));
       vdp = new VectorDisplayPanel();
-      viewPanel = new JPanel(new GridLayout(3,1));
-      viewPanel.add(new JLabel("placeholder"));
-      viewPanel.add(vdp);
+      viewPanel = new JPanel(new BorderLayout(5, 5));//new GridLayout(3,1));
+      
+      xPos = new JTextField("",4);
+      yPos = new JTextField("",4);
+      curl = new JTextField("",4);
+      div = new JTextField("",4);
+      xPos.setEditable(false);
+      yPos.setEditable(false);
+      curl.setEditable(false);
+      div.setEditable(false);
+      
+      statViewPanel = new JPanel(new GridLayout(3, 1));
+      statViewPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+      JPanel tmp;
+      
+      tmp = new JPanel();
+      tmp.add(new JLabel("Position: ("));
+      tmp.add(xPos);
+      tmp.add(new JLabel(", "));
+      tmp.add(yPos);
+      tmp.add(new JLabel(")"));
+      statViewPanel.add(tmp);
+      
+      tmp = new JPanel();
+      tmp.add(new JLabel("Curl: "));
+      tmp.add(curl);
+      tmp.add(new JLabel("k"));
+      statViewPanel.add(tmp);
+      
+      tmp = new JPanel();
+      tmp.add(new JLabel("Divergence: "));
+      tmp.add(div);
+      statViewPanel.add(tmp);
+      
+      
+      viewPanel.add(statViewPanel, BorderLayout.WEST);
+      viewPanel.add(vdp, BorderLayout.EAST);
+      
+      TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Controls");
+      title.setTitleJustification(TitledBorder.LEFT);
+      controlPanel.setBorder(title);
       TitledBorder title2 = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Values");
       title2.setTitleJustification(TitledBorder.LEFT);
+      
+      
       viewPanel.setBorder(title2);
       rightPanel = new JPanel();
       rightPanel.setLayout(new BorderLayout(5, 10));
