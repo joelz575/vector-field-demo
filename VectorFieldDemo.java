@@ -84,6 +84,8 @@ class VFFrame extends JFrame {
    
    private static final double delta = 0.001;
    
+   private static final int viewPanelUpdateTime = 10; // in ticks
+   
   
    private TrackPoint mpoint = new TrackPoint(0,0);
    
@@ -234,13 +236,16 @@ class VFFrame extends JFrame {
             double mm = vf.getMaxMagnitude();
             vdp.setScaled(dx/mm,dy/mm);
             
-            if(tickTime % 5 == 0) {
+            if(tickTime % viewPanelUpdateTime == 0) {
                xPos.setText("" + (int)(0.5+1000*mpoint.x)/1000.0);
                yPos.setText("" + (int)(0.5+1000*mpoint.y)/1000.0);
                // estimate dQ/dx and dP/dy
                double dQdx = (vf.evalYAt(mpoint.x + delta, mpoint.y) - vf.evalYAt(mpoint.x, mpoint.y))/delta;
                double dPdy = (vf.evalXAt(mpoint.x, mpoint.y + delta) - vf.evalXAt(mpoint.x, mpoint.y))/delta;
                curl.setText("" + (int)(0.5+1000*(dQdx-dPdy))/1000.0);
+               double dPdx = (vf.evalXAt(mpoint.x + delta, mpoint.y) - vf.evalXAt(mpoint.x, mpoint.y))/delta;
+               double dQdy = (vf.evalYAt(mpoint.x, mpoint.y + delta) - vf.evalYAt(mpoint.x, mpoint.y))/delta;
+               div.setText("" + (int)(0.5+1000*(dPdx+dQdy))/1000.0);
             }
             
          }
@@ -321,6 +326,8 @@ class VFFrame extends JFrame {
          startPoint.y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
          xPos.setText("");
          yPos.setText("");
+         curl.setText("");
+         div.setText("");
       }
       
       public void mouseReleased(MouseEvent e) {
@@ -350,6 +357,8 @@ class VFFrame extends JFrame {
             
          xPos.setText("");
          yPos.setText("");
+         curl.setText("");
+         div.setText("");
       }
       
       public void mouseClicked(MouseEvent e) {
