@@ -163,10 +163,9 @@ class VFFrame extends JFrame {
       div.setEditable(false);
       
       statViewPanel = new JPanel(new GridLayout(3, 1));
-      statViewPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
       JPanel tmp;
       
-      tmp = new JPanel();
+      tmp = new JPanel(new FlowLayout(FlowLayout.LEFT));
       tmp.add(new JLabel("Position: ("));
       tmp.add(xPos);
       tmp.add(new JLabel(", "));
@@ -174,13 +173,13 @@ class VFFrame extends JFrame {
       tmp.add(new JLabel(")"));
       statViewPanel.add(tmp);
       
-      tmp = new JPanel();
+      tmp = new JPanel(new FlowLayout(FlowLayout.LEFT));
       tmp.add(new JLabel("Curl: "));
       tmp.add(curl);
       tmp.add(new JLabel("k"));
       statViewPanel.add(tmp);
       
-      tmp = new JPanel();
+      tmp = new JPanel(new FlowLayout(FlowLayout.LEFT));
       tmp.add(new JLabel("Divergence: "));
       tmp.add(div);
       statViewPanel.add(tmp);
