@@ -82,10 +82,11 @@ class VFFrame extends JFrame {
    private static final boolean enableTracking = true;
    private static final int numLastPoints = 15;
    
+   private static final double delta = 0.001;
+   
   
    private TrackPoint mpoint = new TrackPoint(0,0);
    
-   //private TrackPoint[] rect = new TrackPoint[4];
    private ArrayList<TrackPoint> figure = new ArrayList<TrackPoint>();
    private int figureResolution = 20;
    
@@ -106,8 +107,8 @@ class VFFrame extends JFrame {
       Container c = this.getContentPane();
       controlPanel = new JPanel();
       controlPanel.setLayout(new GridLayout(8, 1));
-      iComp = new JTextField("-y",5);
-      jComp = new JTextField("x",5);
+      iComp = new JTextField("-y",8);
+      jComp = new JTextField("x",8);
       iCompExpr = iComp.getText();
       jCompExpr = jComp.getText();
       iComp.setHorizontalAlignment(JTextField.RIGHT);
@@ -233,6 +234,15 @@ class VFFrame extends JFrame {
             double mm = vf.getMaxMagnitude();
             vdp.setScaled(dx/mm,dy/mm);
             
+            if(tickTime % 5 == 0) {
+               xPos.setText("" + (int)(0.5+1000*mpoint.x)/1000.0);
+               yPos.setText("" + (int)(0.5+1000*mpoint.y)/1000.0);
+               // estimate dQ/dx and dP/dy
+               double dQdx = (vf.evalYAt(mpoint.x + delta, mpoint.y) - vf.evalYAt(mpoint.x, mpoint.y))/delta;
+               double dPdy = (vf.evalXAt(mpoint.x, mpoint.y + delta) - vf.evalXAt(mpoint.x, mpoint.y))/delta;
+               curl.setText("" + (int)(0.5+1000*(dQdx-dPdy))/1000.0);
+            }
+            
          }
          else if(isRect) {
             for(int j = 0; j < figure.size(); j ++) {
@@ -309,12 +319,14 @@ class VFFrame extends JFrame {
          isSelectingRect = true;
          startPoint.x = (double)e.getX() / VFPanel.wWidth * (parent.maxX - parent.minX + 2) + parent.minX - 1;
          startPoint.y = - ((double)e.getY() / VFPanel.wHeight * (parent.maxY - parent.minY + 2) + parent.minY - 1);
+         xPos.setText("");
+         yPos.setText("");
       }
       
       public void mouseReleased(MouseEvent e) {
          if(isPoint)
             return;
-            
+         
          figure = new ArrayList<TrackPoint>();
          
          isSelectingRect = false;
@@ -335,6 +347,9 @@ class VFFrame extends JFrame {
          for(int i = 0; i < figureResolution; i ++) { // along y = startPoint.y
             figure.add(new TrackPoint(tx + (i * (startPoint.x - tx) / figureResolution), startPoint.y));
          }
+            
+         xPos.setText("");
+         yPos.setText("");
       }
       
       public void mouseClicked(MouseEvent e) {
