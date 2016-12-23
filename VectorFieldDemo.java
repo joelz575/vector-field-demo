@@ -32,9 +32,11 @@ public class VectorFieldDemo {
    public static void main(String[] args) throws Exception {
       VFFrame mframe = new VFFrame();
       while(true) {
-         mframe.tick();
-         Thread.sleep(timeDelay);
-         mframe.repaint();
+         if(mframe.playing) {
+            mframe.tick();
+            Thread.sleep(timeDelay);
+            mframe.repaint();
+         }
       }
    }
 }
@@ -103,6 +105,8 @@ class VFFrame extends JFrame {
    private boolean isSelectingRect = false;
    
    private int tickTime = 0;
+   
+   public boolean playing = true;
 
    public VFFrame() {
       super("Vector Field Demo");
@@ -140,8 +144,16 @@ class VFFrame extends JFrame {
       //controlPanel.add(update);
       //controlPanel.add(new JButton("Change Window"));
       
+      changeWindow = new JButton("Change Window");
+      changeWindow.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent e) {
+            WindowSizeSelectorFrame wssf = new WindowSizeSelectorFrame(VFFrame.this);
+            playing = false;
+         }
+      });
+      
       miniButtonPanel.add(update);
-      miniButtonPanel.add(new JButton("Change Window"));
+      miniButtonPanel.add(changeWindow);
       
       controlPanel.add(miniButtonPanel);
       
@@ -591,10 +603,13 @@ class WindowSizeSelectorFrame extends JFrame {
    private JTextField yMax;
    
    private JPanel mainPanel;
+   private JPanel inputPanel;
+   
+   private JButton updateButton;
    
 
    public WindowSizeSelectorFrame(VFFrame parent) {
-      super("Select Window Size");
+      super("Window");
       this.setResizable(false);
       this.setSize(400,400); // gets repacked
       this.setVisible(true);
@@ -603,7 +618,7 @@ class WindowSizeSelectorFrame extends JFrame {
       
       int[] curscale = parent.getScale();
       
-      mainPanel = new JPanel(new GridLayout(2,2));
+      inputPanel = new JPanel(new GridLayout(2,2,15,2));
       xMin = new JTextField(""+curscale[0],3);
       xMax = new JTextField(""+curscale[1],3);
       yMin = new JTextField(""+curscale[2],3);
@@ -614,24 +629,43 @@ class WindowSizeSelectorFrame extends JFrame {
       tmp = new JPanel();
       tmp.add(new JLabel("X min:"));
       tmp.add(xMin);
-      mainPanel.add(tmp);
+      inputPanel.add(tmp);
       
       tmp = new JPanel();
       tmp.add(new JLabel("X max:"));
       tmp.add(xMax);
-      mainPanel.add(tmp);
+      inputPanel.add(tmp);
       
       tmp = new JPanel();
       tmp.add(new JLabel("Y min:"));
       tmp.add(yMin);
-      mainPanel.add(tmp);
+      inputPanel.add(tmp);
       
       tmp = new JPanel();
       tmp.add(new JLabel("Y max:"));
       tmp.add(yMax);
+      inputPanel.add(tmp);
+      
+      updateButton = new JButton("Update");
+      updateButton.addActionListener(new ActionListener() { 
+         public void actionPerformed(ActionEvent e) {
+            WindowSizeSelectorFrame.this.dispose();
+         }
+      });
+      
+      tmp = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
+      tmp.add(inputPanel);
+      inputPanel = tmp;
+      
+      tmp = new JPanel(new BorderLayout());
+      tmp.add(inputPanel, BorderLayout.NORTH);
+      tmp.add(updateButton, BorderLayout.SOUTH);
+      
+      mainPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
       mainPanel.add(tmp);
       
       this.add(mainPanel);
+      this.pack();
    }
    
 }
