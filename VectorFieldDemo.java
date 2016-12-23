@@ -34,9 +34,9 @@ public class VectorFieldDemo {
       while(true) {
          if(mframe.playing) {
             mframe.tick();
-            Thread.sleep(timeDelay);
             mframe.repaint();
          }
+         Thread.sleep(timeDelay);
       }
    }
 }
@@ -92,7 +92,6 @@ class VFFrame extends JFrame {
    
    private static final int viewPanelUpdateTime = 10; // in ticks
    
-  
    private TrackPoint mpoint = new TrackPoint(0,0);
    
    private ArrayList<TrackPoint> figure = new ArrayList<TrackPoint>();
@@ -140,9 +139,6 @@ class VFFrame extends JFrame {
             jCompExpr = jComp.getText();
          }
       });
-      
-      //controlPanel.add(update);
-      //controlPanel.add(new JButton("Change Window"));
       
       changeWindow = new JButton("Change Window");
       changeWindow.addActionListener(new ActionListener() {
@@ -649,7 +645,15 @@ class WindowSizeSelectorFrame extends JFrame {
       updateButton = new JButton("Update");
       updateButton.addActionListener(new ActionListener() { 
          public void actionPerformed(ActionEvent e) {
-            WindowSizeSelectorFrame.this.dispose();
+            WindowSizeSelectorFrame parent = WindowSizeSelectorFrame.this;
+            int nxmin,nxmax,nymin,nymax;
+            nxmin = Integer.parseInt(parent.xMin.getText());
+            nxmax = Integer.parseInt(parent.xMax.getText());
+            nymin = Integer.parseInt(parent.yMin.getText());
+            nymax = Integer.parseInt(parent.yMax.getText());
+            parent.parent.setScale(nxmin, nxmax, nymin, nymax);
+            parent.parent.playing = true;
+            parent.dispose();
          }
       });
       
