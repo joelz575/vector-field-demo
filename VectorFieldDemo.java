@@ -47,7 +47,10 @@ class VFFrame extends JFrame {
    private JPanel viewPanel;
    private JPanel eqnPanel;
    private JPanel statViewPanel;
+   private JPanel miniButtonPanel;
+   
    private JButton update;
+   private JButton changeWindow;
    
    private JTextField xPos;
    private JTextField yPos;
@@ -56,6 +59,7 @@ class VFFrame extends JFrame {
    
    private JTextField iComp;
    private JTextField jComp;
+   
    private String iCompExpr;
    private String jCompExpr;
    
@@ -122,6 +126,9 @@ class VFFrame extends JFrame {
       eqnPanel.add(jComp);
       eqnPanel.add(new JLabel("j"));
       controlPanel.add(eqnPanel);
+      
+      miniButtonPanel = new JPanel();
+      
       update = new JButton("Update Vector Field");
       update.addActionListener(new ActionListener() { 
          public void actionPerformed(ActionEvent e) {
@@ -129,7 +136,15 @@ class VFFrame extends JFrame {
             jCompExpr = jComp.getText();
          }
       });
-      controlPanel.add(update);
+      
+      //controlPanel.add(update);
+      //controlPanel.add(new JButton("Change Window"));
+      
+      miniButtonPanel.add(update);
+      miniButtonPanel.add(new JButton("Change Window"));
+      
+      controlPanel.add(miniButtonPanel);
+      
       speedControl = new JSlider(JSlider.HORIZONTAL, 1, 10, 6);
       speedControl.addChangeListener(new SpeedSliderListener());
       speedControl.setMajorTickSpacing(5);
@@ -209,6 +224,17 @@ class VFFrame extends JFrame {
       mainPanel.add(rightPanel);
       this.add(mainPanel);
       this.pack();
+   }
+   
+   public void setScale(int minX, int maxX, int minY, int maxY) {
+      vf.minX = minX;
+      vf.maxX = maxX;
+      vf.minY = minY;
+      vf.maxY = maxY;
+   }
+   
+   public int[] getScale() {
+      return new int[] {vf.minX, vf.maxX, vf.minY, vf.maxY};
    }
    
    public void tick() {
@@ -551,4 +577,61 @@ class VFFrame extends JFrame {
          return new Dimension(wWidth,wHeight);
       }
    }
+}
+
+
+
+class WindowSizeSelectorFrame extends JFrame {
+
+   private VFFrame parent;
+   
+   private JTextField xMin;
+   private JTextField xMax;
+   private JTextField yMin;
+   private JTextField yMax;
+   
+   private JPanel mainPanel;
+   
+
+   public WindowSizeSelectorFrame(VFFrame parent) {
+      super("Select Window Size");
+      this.setResizable(false);
+      this.setSize(400,400); // gets repacked
+      this.setVisible(true);
+      
+      this.parent = parent;
+      
+      int[] curscale = parent.getScale();
+      
+      mainPanel = new JPanel(new GridLayout(2,2));
+      xMin = new JTextField(""+curscale[0],3);
+      xMax = new JTextField(""+curscale[1],3);
+      yMin = new JTextField(""+curscale[2],3);
+      yMax = new JTextField(""+curscale[3],3);
+      
+      JPanel tmp;
+      
+      tmp = new JPanel();
+      tmp.add(new JLabel("X min:"));
+      tmp.add(xMin);
+      mainPanel.add(tmp);
+      
+      tmp = new JPanel();
+      tmp.add(new JLabel("X max:"));
+      tmp.add(xMax);
+      mainPanel.add(tmp);
+      
+      tmp = new JPanel();
+      tmp.add(new JLabel("Y min:"));
+      tmp.add(yMin);
+      mainPanel.add(tmp);
+      
+      tmp = new JPanel();
+      tmp.add(new JLabel("Y max:"));
+      tmp.add(yMax);
+      mainPanel.add(tmp);
+      
+      this.add(mainPanel);
+   }
+   
 }
