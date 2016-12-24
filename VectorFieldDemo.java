@@ -609,6 +609,14 @@ class WindowSizeSelectorFrame extends JFrame {
       this.setResizable(false);
       this.setSize(400,400); // gets repacked
       this.setVisible(true);
+      this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      this.addWindowListener(new WindowAdapter() {
+         @Override
+         public void windowClosing(WindowEvent e) {  
+            WindowSizeSelectorFrame parent = WindowSizeSelectorFrame.this;
+            parent.finishClosing();
+         }
+      });
       
       this.parent = parent;
       
@@ -646,14 +654,7 @@ class WindowSizeSelectorFrame extends JFrame {
       updateButton.addActionListener(new ActionListener() { 
          public void actionPerformed(ActionEvent e) {
             WindowSizeSelectorFrame parent = WindowSizeSelectorFrame.this;
-            int nxmin,nxmax,nymin,nymax;
-            nxmin = Integer.parseInt(parent.xMin.getText());
-            nxmax = Integer.parseInt(parent.xMax.getText());
-            nymin = Integer.parseInt(parent.yMin.getText());
-            nymax = Integer.parseInt(parent.yMax.getText());
-            parent.parent.setScale(nxmin, nxmax, nymin, nymax);
-            parent.parent.playing = true;
-            parent.dispose();
+            parent.finishClosing();
          }
       });
       
@@ -670,6 +671,17 @@ class WindowSizeSelectorFrame extends JFrame {
       
       this.add(mainPanel);
       this.pack();
+   }
+   
+   public void finishClosing() {
+      int nxmin,nxmax,nymin,nymax;
+      nxmin = Integer.parseInt(this.xMin.getText());
+      nxmax = Integer.parseInt(this.xMax.getText());
+      nymin = Integer.parseInt(this.yMin.getText());
+      nymax = Integer.parseInt(this.yMax.getText());
+      this.parent.setScale(nxmin, nxmax, nymin, nymax);
+      this.parent.playing = true;
+      this.dispose();
    }
    
 }
