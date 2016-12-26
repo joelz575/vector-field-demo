@@ -683,5 +683,4 @@ class WindowSizeSelectorFrame extends JFrame {
       this.parent.playing = true;
       this.dispose();
    }
-   
 }
