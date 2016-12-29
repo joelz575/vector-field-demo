@@ -1,7 +1,7 @@
 # vector-field-demo
-Java application to demonstrate what vector fields are and how they work
+This is an interactive Java application to demonstrate what vector fields are and how they work.
 
-uses [exp4j](http://projects.congrace.de/exp4j/download.html), a free library for evaluating functions
+Uses [exp4j](http://projects.congrace.de/exp4j/download.html), a free library for evaluating functions.
 
 ## Features
 * Visualize vector field of arbitrary 2D vector-valued function
@@ -12,9 +12,23 @@ uses [exp4j](http://projects.congrace.de/exp4j/download.html), a free library fo
 
 ## Controls
 Function
-> As a 2D vector-valued function, it has an i-vector component and a j-vector component, both of which are functions of x and y
+> As a 2D vector-valued function, it has an i-vector component and a j-vector component, both of which are functions of x and y.
 
-> Any valid function of x and y will be accepted, including trigonometric functions; anything that [exp4j supports](http://www.objecthunter.net/exp4j/#Built-in_functions)
+> Any valid function of x and y will be accepted, including trigonometric functions; anything that [exp4j supports](http://www.objecthunter.net/exp4j/#Built-in_functions).
+
+> After changing the function, you must press the "Update Vector Field" button for the visualization to update.
+
+Speed
+> Controls the internal delay used between updating the position of the point (or points, in the case of a rectangle) when having dropped one onto the field.
+
+> For cases where larger amounts of computation is involved, changing the speed bar may have little effect; consider changing the resolution instead (see below).
+
+Resolution
+> Points are essentially moved through approximating a differential by taking very small "steps" according to the current vector, resolution determines the size of these steps.
+
+> A higher resolution will make it more precise, and will give more accuracy according to the path that should be expected, although this is likely not noticeable.
+
+> A lower resolution may cause noticeable deviance from expected behavior in certain cases, but often will not make a difference. Lowering resolution can also be very useful when computation load is high (such as dropping a rectangle), and may grant a considerable speed boost.
 
 ## Screenshots
 <img src="https://raw.githubusercontent.com/shrucis1/vector-field-demo/master/screenshots/screenshot_01.png" alt="screenshot_01" height="300"/><img src="https://raw.githubusercontent.com/shrucis1/vector-field-demo/master/screenshots/screenshot_02.png" alt="screenshot_02" height="300"/>
