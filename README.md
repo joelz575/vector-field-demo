@@ -10,6 +10,12 @@ uses [exp4j](http://projects.congrace.de/exp4j/download.html), a free library fo
 * When there is a point, see instantaneous values (Values tab)
 * Change window size to better visualize function
 
+## Controls
+Function
+> As a 2D vector-valued function, it has an i-vector component and a j-vector component, both of which are functions of x and y
+
+> Any valid function of x and y will be accepted, including trigonometric functions; anything that [exp4j supports](http://www.objecthunter.net/exp4j/#Built-in_functions)
+
 ## Screenshots
 <img src="https://raw.githubusercontent.com/shrucis1/vector-field-demo/master/screenshots/screenshot_01.png" alt="screenshot_01" height="300"/><img src="https://raw.githubusercontent.com/shrucis1/vector-field-demo/master/screenshots/screenshot_02.png" alt="screenshot_02" height="300"/>
 <img src="https://raw.githubusercontent.com/shrucis1/vector-field-demo/master/screenshots/screenshot_03.png" alt="screenshot_03" height="300"/><img src="https://raw.githubusercontent.com/shrucis1/vector-field-demo/master/screenshots/screenshot_04.png" alt="screenshot_04" height="300"/>
